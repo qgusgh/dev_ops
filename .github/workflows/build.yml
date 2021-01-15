@@ -9,6 +9,9 @@ on:
 env:
   SOLUTION_FILE_PATH: ./devops
   BUILD_CONFIGURATION: Debug
+  SONAR_WRAPPER_URL: https://sonarcloud.io/static/cpp/build-wrapper-win-x86.zip
+  SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-windows.zip
+  # sonar-scanner-msbuild 도 사용 고려
 
 jobs:
   build:
@@ -16,34 +19,56 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+      with:
+        vs-version: '[,16.8]'
+    
     - name: Cache SonarCloud workspace
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: ~\.sonar\cache
         key: ${{ runner.os }}-sonar-cache
         restore-keys: ${{ runner.os }}-sonar-cache
 
-    - name: Cache SonarCloud scanner
+    - name: Cache SonarScanner
       id: cache-sonar-scanner
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: .\.sonar\scanner
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
 
-    - name: Install SonarCloud scanner
+    - name: Install SonarScanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-      shell: powershell
       run: |
-        New-Item -Path .\.sonar\scanner -ItemType Directory
-        dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
-      with:
-        vs-version: '[,16.8]'
+        Invoke-WebRequest -Uri "${{ env.SONAR_WRAPPER_URL }}" -OutFile build-wrapper.zip
+        Invoke-WebRequest -Uri "${{ env.SONAR_SCANNER_URL }}" -OutFile sonar-scanner.zip
+        Expand-Archive build-wrapper.zip
+        Expand-Archive sonar-scanner.zip
 
     - name: Build
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: dotnet build /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      shell: cmd
+      run: |
+        SET PATH=%PATH%;%cd%\build-wrapper-win-x86
+        build-wrapper-win-x86-64 --out-dir bw_output msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      
+      # original
       # run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      
+      # 1. community 글 참조해서 sonar wrapper와 sonar scanner 설치, 추가로 cache활용까지
+      # 2. build wrapper와 msbuild를 함께 사용해서 build, msbuild path설정 필요.
+      #    build-wrapper-win-x86-64 --out-dir build\bw_output msbuild
+      # 3. sonar 빌드 결과물에 sonar scanner 적용
+
+      # dotnet msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      # build-wrapper-win-x86-64.exe --out-dir bw-output MSBuild.exe -p:Configuration=Debug -p:Platform=x64 devops/devops.sln
+      # dotnet-sonarscanner -Dsonar.cfamily.build-wrapper-output=bw-output
+      
+      # 원래 powershell로 실행되던 부분 # run: 
+
+      # travis보면 wrapper와 같이 빌드를 하는데 이때 shell은 bash이다. 여기서도 shell을 bash로 설정할 수 있고
+      # 따라서 wrpper.exe를 설치하기는 귀찮지만(community에 공유한 글이 설치를 하는 것을 보여준다/.)
+      # 그냥 wrapper도 git에 넣어서 실행시키면 그냥 돌아갈 듯. 
+      # 근데 어짜피 sonar-scanner를 깔아야 하기 때문에 겸사겸사 둘다 깔면 좋지...
+      # 먼저 token설정이 필요하다.

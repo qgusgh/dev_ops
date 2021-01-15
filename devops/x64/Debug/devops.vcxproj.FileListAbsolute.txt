@@ -1,0 +1,2 @@
+C:\Users\user\Desktop\dev_ops\devops\x64\Debug\devops.exe
+C:\Users\user\Desktop\dev_ops\devops\x64\Debug\devops.pdb

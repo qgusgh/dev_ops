@@ -1,4 +1,5 @@
-# dev_ops
+[![Build Status](https://travis-ci.com/qgusgh/dev_ops.svg?branch=main)](https://travis-ci.com/qgusgh/dev_ops)
+# dev_ops 
 practice for dev ops setting
 
 ## settings

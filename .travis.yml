@@ -4,6 +4,13 @@ env:
   - MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
 install:
   - choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+addons:
+  sonarcloud:
+    organization: "qgusgh"
+    token:
+      secure: "16cElfKxphbi+GxRP/hORDS7OZiG6A3qAocrC28r1DgTD/2g6X9ewZXLm6eifHocPu1EV4pSP2OE9AzJEewOR1RDUaAyYcniZg5cJosyp57XxtiAZhFysJtcgo2DCoukyIyMn0EwmOaJpwisWk0QbrkBS2dGeb7qWytgl6Ys84MifBfbpp+qIvbvsByy1kBvPW7FunFvlHnD6oTsPtoc3H8a3WBj3FUgMXfoFBiGstuG4fTsSJWZE08ffbo2WppcSxJMrUE1oHQkXRI0ntDrYNkumL/Yal8PbeskoTFevYd5wNaGleCk9OP1eRaB+xxU9t7/PHS5pPs2QaGs4HRqU5ZTLZJ/EihdKGM2ICesbLvh46Gk5hqlhZ2ZyY8zrD5A8jzcjeTuoSh108RYW2U0BCptWCSVkDZP2iPiSATVAoTV5As20km76DBJZD9koiFop4xwvlJtakQiL4MxBcACJkd492ZY5gZSPYokC2SOsaJSuOVlnQ1G14sMK0LSEuXMNm3AlHKYcrtH/h+SD4TrkR6/3ooDlHH0qwROEzelbZXjMj5R7khRx3cHQDBus8omOSSzjbPHK/BmVgQgunykBWr/qLZ2mEKJ2wY+Vv6RALVgu5JCnEXkbXQPHRzUNzdkg4vA0be/RBddwwzsQ+Z/JzWbg6HIiolALSGz6CMkR4o="
 script:
   - export PATH=$MSBUILD_PATH:$PATH
-  - MSBuild.exe -p:Configuration=Debug -p:Platform=x64 devops/devops.sln
+  - build-wrapper-win-x86-64.exe --out-dir bw-output MSBuild.exe -p:Configuration=Debug -p:Platform=x64 devops/devops.sln
+  - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
+  

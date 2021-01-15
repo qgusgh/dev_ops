@@ -1,4 +1,4 @@
-![MSBuild Debug](https://github.com/qgusgh/dev_ops/workflows/MSBuild/badge.svg)
+![Build](https://github.com/qgusgh/dev_ops/workflows/Build/badge.svg)
 # dev_ops 
 practice for dev ops setting
 

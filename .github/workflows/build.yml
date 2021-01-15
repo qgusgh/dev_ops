@@ -37,11 +37,11 @@ jobs:
       run: |
         New-Item -Path .\.sonar\scanner -ItemType Directory
         dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-        
+
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
       with:
-        vs-version: '[16.8.4]'
+        vs-version: '[16.8]'
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}

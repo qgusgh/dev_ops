@@ -41,8 +41,8 @@ jobs:
 
     - name: Build
       run: |
-        .\sonar\build-wrapper\build-wrapper-win-x86\build-wrapper-win-x86-64.exe --out-dir bw_output msbuild -m -p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+        .\sonar\build-wrapper-win-x86\build-wrapper-win-x86-64.exe --out-dir bw_output msbuild -m -p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
 
     - name: Run SonarScanner        
       run: |
-        .\sonar\sonar-scanner\sonar-scanner-4.5.0.2216-windows\bin\sonar-scanner.bat -D sonar.login="${{secrets.SONAR_TOKEN}}" -D sonar.cfamily.build-wrapper-output=./bw_output -D sonar.host.url="https://sonarcloud.io"
+        .\sonar\sonar-scanner-4.5.0.2216-windows\bin\sonar-scanner.bat -D sonar.login="${{secrets.SONAR_TOKEN}}" -D sonar.cfamily.build-wrapper-output=./bw_output -D sonar.host.url="https://sonarcloud.io"

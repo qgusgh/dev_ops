@@ -48,7 +48,7 @@ jobs:
         Expand-Archive sonar-scanner.zip
 
     - name: Build
-      shell: cmd
+      shell: pwsh
       run: |
         ./build-wrapper/build-wrapper-win-x86-64 --out-dir bw_output msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
 
@@ -56,7 +56,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      shell: cmd
+      shell: pwsh
       run: |
         ./sonar-scanner/sonar-scanner-4.6.0.2311-windows/bin/sonar-scanner.bat -Dsonar.cfamily.build-wrapper-output=./bw_output
 

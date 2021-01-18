@@ -38,6 +38,7 @@
 #include <boost/type_traits/is_volatile.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <string.h>
 
 #if (defined(_MSC_VER) && _MSC_VER > 1600) \
     || (defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ > 5 && defined(__GXX_EXPERIMENTAL_CXX0X__)) \
@@ -144,7 +145,7 @@ inline std::string stl_type_index::pretty_name() const {
         boost::throw_exception(std::runtime_error("Type name demangling failed"));
     }
 
-    const std::string::size_type len = std::strnlen_s(begin, sizeof begin);
+    const std::string::size_type len = strnlen_s(begin, sizeof begin);
     const char* end = begin + len;
 
     if (len > cvr_saver_name_len) {

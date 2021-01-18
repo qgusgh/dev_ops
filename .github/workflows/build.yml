@@ -29,7 +29,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: .\.sonar
-        key: ${{ runner.os }}-sonar
+        key: ${{ runner.os }}-sonar-${{ secrets.CACHE_VERSION }}
 
     - name: Install SonarScanner
       if: steps.cache-sonar.outputs.cache-hit != 'true'
@@ -37,8 +37,8 @@ jobs:
         New-Item -Path .\.sonar -ItemType Directory
         Invoke-WebRequest -Uri "${{ env.SONAR_WRAPPER_URL }}" -OutFile .\.sonar\build-wrapper.zip
         Invoke-WebRequest -Uri "${{ env.SONAR_SCANNER_URL }}" -OutFile .\.sonar\sonar-scanner.zip
-        Expand-Archive .\.sonar\build-wrapper.zip .\sonar
-        Expand-Archive .\.sonar\sonar-scanner.zip .\sonar
+        Expand-Archive .\.sonar\build-wrapper.zip .\.sonar
+        Expand-Archive .\.sonar\sonar-scanner.zip .\.sonar
 
     - name: Build
       run: |

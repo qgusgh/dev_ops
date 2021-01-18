@@ -28,15 +28,13 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          .\build-wrapper
-          .\sonar-scanner
+          build-wrapper
+          sonar-scanner
         key: ${{ runner.os }}-sonar-cache
-        restore-keys: ${{ runner.os }}-sonar-cache
 
     - name: Install SonarScanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
       run: |
-        dir
         Invoke-WebRequest -Uri "${{ env.SONAR_WRAPPER_URL }}" -OutFile build-wrapper.zip
         Invoke-WebRequest -Uri "${{ env.SONAR_SCANNER_URL }}" -OutFile sonar-scanner.zip
         Expand-Archive build-wrapper.zip
@@ -53,7 +51,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: pwsh
       run: |
-        ./sonar-scanner/sonar-scanner-4.6.0.2311-windows/bin/sonar-scanner.bat -Dsonar.cfamily.build-wrapper-output=./bw_output
+        ./sonar-scanner/sonar-scanner-4.5.0.2216-windows/bin/sonar-scanner.bat -Dsonar.cfamily.build-wrapper-output=./bw_output
 
       # SET PATH=%PATH%;%cd%\build\sonar-scanner\bin
       # ECHO PATH=%PATH%

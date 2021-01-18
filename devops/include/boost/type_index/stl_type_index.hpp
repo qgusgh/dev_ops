@@ -144,7 +144,7 @@ inline std::string stl_type_index::pretty_name() const {
         boost::throw_exception(std::runtime_error("Type name demangling failed"));
     }
 
-    const std::string::size_type len = std::strlen(begin);
+    const std::string::size_type len = std::strnlen_s(begin, sizeof begin);
     const char* end = begin + len;
 
     if (len > cvr_saver_name_len) {

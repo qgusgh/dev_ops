@@ -24,24 +24,20 @@ jobs:
       with:
         vs-version: '[,16.8]'
     
-    - name: Cache build wrapper
+    - name: Cache build wrapper & SonarScanner
+      id: cache-sonar
       uses: actions/cache@v2
       with:
-        path: .\build-wrapper
-        key: ${{ runner.os }}-build-wrapper-cache
-        restore-keys: ${{ runner.os }}-build-wrapper-cache
-
-    - name: Cache SonarScanner
-      id: cache-sonar-scanner
-      uses: actions/cache@v2
-      with:
-        path: .\sonar-scanner
-        key: ${{ runner.os }}-sonar-scanner
-        restore-keys: ${{ runner.os }}-sonar-scanner
+        path: |
+          .\build-wrapper
+          .\sonar-scanner
+        key: ${{ runner.os }}-sonar-cache
+        restore-keys: ${{ runner.os }}-sonar-cache
 
     - name: Install SonarScanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
       run: |
+        dir
         Invoke-WebRequest -Uri "${{ env.SONAR_WRAPPER_URL }}" -OutFile build-wrapper.zip
         Invoke-WebRequest -Uri "${{ env.SONAR_SCANNER_URL }}" -OutFile sonar-scanner.zip
         Expand-Archive build-wrapper.zip
@@ -50,9 +46,7 @@ jobs:
     - name: Build
       shell: pwsh
       run: |
-        cd .\build-wrapper\build-wrapper-win-x86
-        dir
-        .\build-wrapper\build-wrapper-win-x86\buildwrapper-win-x86-64.exe --out-dir bw_output msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+        .\build-wrapper\build-wrapper-win-x86\build-wrapper-win-x86-64.exe --out-dir bw_output msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
 
     - name: SonarScanner
       env:

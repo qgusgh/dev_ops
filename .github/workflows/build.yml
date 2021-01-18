@@ -50,8 +50,22 @@ jobs:
     - name: Build
       shell: cmd
       run: |
-        SET PATH=%PATH%;%cd%\build-wrapper-win-x86
-        build-wrapper-win-x86-64 --out-dir bw_output msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+        ./build-wrapper/build-wrapper-win-x86-64 --out-dir bw_output msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+
+    - name: SonarScanner
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      shell: cmd
+      run: |
+        ./sonar-scanner/sonar-scanner-4.6.0.2311-windows/bin/sonar-scanner.bat -Dsonar.cfamily.build-wrapper-output=./bw_output
+
+        # SET PATH=%PATH%;%cd%\build\sonar-scanner\bin
+        # ECHO PATH=%PATH%
+        # ECHO DIR %cd%\build\bw_output\
+        # DIR %cd%\build\bw_output\
+        # ./sonar-scanner.bat -Dsonar.cfamily.build-wrapper-output=%cd%\build\bw_output
+
       
       # original
       # run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
@@ -64,8 +78,6 @@ jobs:
       # dotnet msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
       # build-wrapper-win-x86-64.exe --out-dir bw-output MSBuild.exe -p:Configuration=Debug -p:Platform=x64 devops/devops.sln
       # dotnet-sonarscanner -Dsonar.cfamily.build-wrapper-output=bw-output
-      
-      # 원래 powershell로 실행되던 부분 # run: 
 
       # travis보면 wrapper와 같이 빌드를 하는데 이때 shell은 bash이다. 여기서도 shell을 bash로 설정할 수 있고
       # 따라서 wrpper.exe를 설치하기는 귀찮지만(community에 공유한 글이 설치를 하는 것을 보여준다/.)
